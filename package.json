@@ -1,10 +1,10 @@
 {
-  "private": true,
   "name": "inman",
   "description": "Inventory Management System",
   "version": "1.0.0",
   "author": "Shakhzodbek Kakhkhorov <https://github.com/AbdukahharS>",
   "main": "app/background.js",
+  "license": "MIT",
   "scripts": {
     "dev": "nextron",
     "build": "nextron build",
