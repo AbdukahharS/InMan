@@ -3,12 +3,13 @@ import { createCustomer, getCustomers, updateCustomer } from '../db/functions/cu
 import { Customer } from '../db/schemas'; // Import customer types
 
 interface CustomerState {
-  customers: Customer[];
-  active: Customer | null;
-  fetchCustomers: () => void;
-  addCustomer: (name: string, phone?: string) => void;
-  editCustomer: (_id: string, name?: string, phone?: string) => void;
-  setActive: (customer: string | null) => void;
+  customers: Customer[]
+  active: Customer | null
+  fetchCustomers: () => void
+  addCustomer: (name: string, phone?: string) => void
+  editCustomer: (_id: string, name?: string, phone?: string) => void
+  setActive: (customer: string | null) => void
+  updateActive: (customer: Customer | null) => void
 }
 
 const useCustomerStore = create<CustomerState>((set, get) => ({
@@ -17,34 +18,38 @@ const useCustomerStore = create<CustomerState>((set, get) => ({
 
   // Fetch customers from PouchDB
   fetchCustomers: async () => {
-    const customers = await getCustomers();
-    set({ customers: customers as any as Customer[] });
+    const customers = await getCustomers()
+    set({ customers: customers as any as Customer[] })
   },
 
   // Create a new customer
   addCustomer: async (name: string, phone?: string) => {
-    const response = await createCustomer({name, phone});
+    const response = await createCustomer({ name, phone })
     if (response.ok) {
-
-        set((state) => ({
-            customers: [...state.customers, {_id: response.id, name, phone, debt: 0} as Customer],
-        }));
+      set((state) => ({
+        customers: [
+          ...state.customers,
+          { _id: response.id, name, phone, debt: 0 } as Customer,
+        ],
+      }))
     }
   },
 
   // Update an existing customer
   editCustomer: async (_id: string, name?: string, phone?: string) => {
-    const updatedCustomer = await updateCustomer({ _id, name, phone });
+    const updatedCustomer = await updateCustomer({ _id, name, phone })
     set((state) => ({
       customers: state.customers.map((customer) =>
-        customer._id === _id ? { ...updatedCustomer, ...customer} : customer
+        customer._id === _id ? { ...updatedCustomer, ...customer } : customer
       ),
-    }));
+    }))
     get().fetchCustomers()
   },
 
   // Select active customer
-  setActive: (customer) => set({ active: get().customers.find((c) => c._id === customer) }),
-}));
+  setActive: (customer) =>
+    set({ active: get().customers.find((c) => c._id === customer) }),
+  updateActive: (customer) => set({ active: customer }),
+}))
 
 export default useCustomerStore;

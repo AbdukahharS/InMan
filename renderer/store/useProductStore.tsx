@@ -39,7 +39,20 @@ const useProductStore = create<ProductState>((set, get) => ({
   // Fetch products from LowDB
   fetchProducts: async () => {
     const products = await getProducts()
-    set({ products })
+    set({
+      products: products.sort((a, b) => {
+        // First compare by folder
+        if (a.folder < b.folder) return -1
+        if (a.folder > b.folder) return 1
+
+        // If folders are the same, compare by name
+        if (a.name < b.name) return -1
+        if (a.name > b.name) return 1
+
+        // If both folder and name are the same, return 0
+        return 0
+      }),
+    })
   },
 
   // Fetch products of a supplier

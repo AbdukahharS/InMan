@@ -5,7 +5,7 @@ import useFolderStore from '@/store/useFolderStore'
 import useWarehouseStore from '@/store/useWarehouseStore'
 import useCustomerStore from '@/store/useCustomerStore'
 import useSaleStore from '@/store/useSaleStore'
-import { Sale, Warehouse } from '@/db/schemas'
+import { Warehouse } from '@/db/schemas'
 import { getSalesOfCustomerToday } from '@/db/functions/saleFns'
 
 const useSale = () => {
@@ -21,6 +21,7 @@ const useSale = () => {
     setActive: setCustomer,
     customers,
     fetchCustomers,
+    updateActive: updateCustomer,
   } = useCustomerStore()
   const {
     addItem,
@@ -91,6 +92,7 @@ const useSale = () => {
     clearSale,
     paymentCard,
     paymentCash,
+    updateCustomer,
   }
 }
 

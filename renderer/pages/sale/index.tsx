@@ -39,6 +39,7 @@ const Page = () => {
   const { reload } = useRouter()
   const {
     customer,
+    updateCustomer,
     totalSellPrice,
     saleProducts,
     payment,
@@ -82,15 +83,26 @@ const Page = () => {
             (salePrev.payment.cash - payment.cash) +
             (salePrev.payment.card - payment.card)
         )
+        updateCustomer({
+          ...customer,
+          debt:
+            customer.debt +
+            totalSellPrice -
+            salePrev.totalSellPrice +
+            (salePrev.payment.cash - payment.cash) +
+            (salePrev.payment.card - payment.card),
+        })
         await updateSale({
           _id: salePrev._id,
-          products: saleProducts.map((p) => ({
-            amount: p.amount,
-            sellPrice: p.sellPrice,
-            _id: p._id,
-            name: p.name,
-            unit: p.unit,
-          })).filter((p) => p.amount > 0),
+          products: saleProducts
+            .map((p) => ({
+              amount: p.amount,
+              sellPrice: p.sellPrice,
+              _id: p._id,
+              name: p.name,
+              unit: p.unit,
+            }))
+            .filter((p) => p.amount > 0),
           totalSellPrice,
           payment: payment,
         })
@@ -106,7 +118,12 @@ const Page = () => {
           })),
           totalSellPrice,
           payment: payment,
-          timeStamp: today()
+          timeStamp: today(),
+        })
+
+        updateCustomer({
+          ...customer,
+          debt: totalSellPrice - payment.cash - payment.card,
         })
       }
 
