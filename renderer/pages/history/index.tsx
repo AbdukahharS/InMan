@@ -37,7 +37,7 @@ const Page = () => {
   return (
     <div className='h-[100vh]'>
       <Navbar />
-      <main className='h-full pt-10'>
+      <main className='h-full pt-10 bg-background'>
         <ResizablePanelGroup direction='horizontal'>
           <ResizablePanel minSize={30}>
             <div className='w-full h-full overflow-x-auto flex flex-col'>
