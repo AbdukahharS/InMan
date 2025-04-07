@@ -1,6 +1,6 @@
 import PouchDB from 'pouchdb'
 import { round } from '@/lib/utils' // Import your rounding utility function
-import { Customer, Sale } from '../schemas'
+import { Customer, Sale, Warehouse } from '../schemas'
 
 function today() {
   const d = new Date()
@@ -13,6 +13,7 @@ function today() {
 
 const salesDB = new PouchDB('sales')
 const customersDB = new PouchDB('customers')
+const warehouseDB = new PouchDB('warehouse')
 
 // Get a single sale by ID
 export const getSale = async (id: string) => {
@@ -147,13 +148,10 @@ export const getCustomerSaleRanking = async (start: number, end: number) => {
 // Get sales of a customer for today
 export const getSalesOfCustomerToday = async (customer: string) => {
   try {
-    
     const allDocs = await salesDB.allDocs({ include_docs: true })
     const saleToday = allDocs.rows
       .map((row) => row.doc as any as Sale)
-      .find((sale) => (
-        sale.customer === customer && sale.timeStamp === today()
-      ))
+      .find((sale) => sale.customer === customer && sale.timeStamp === today())
 
     return saleToday
   } catch (error) {
@@ -212,5 +210,126 @@ export const updateSale = async (args: {
   } catch (error) {
     console.error('Error updating sale', error)
     throw new Error('Error updating sale')
+  }
+}
+
+/**
+ * Return a specific product from a sale and update warehouse inventory
+ * @param saleId - ID of the sale to return product from
+ * @param productId - ID of the product to return
+ * @param returnAmount - Amount of product to return (must be <= original amount)
+ * @returns Updated sale document
+ */
+export const returnProductFromSale = async (
+  saleId: string,
+  productId: string,
+  returnAmount: number
+) => {
+  try {
+    // Get the sale document
+    const sale = (await salesDB.get(saleId)) as any as Sale
+    if (!sale) {
+      throw new Error('Sale not found')
+    }
+
+    // Find the product in the sale
+    const productIndex = sale.products.findIndex(
+      (product) => product._id === productId
+    )
+    if (productIndex === -1) {
+      throw new Error('Product not found in this sale')
+    }
+
+    const saleProduct = sale.products[productIndex]
+
+    // Validate return amount
+    if (returnAmount <= 0) {
+      throw new Error('Return amount must be greater than zero')
+    }
+
+    if (returnAmount > saleProduct.amount) {
+      throw new Error(
+        `Cannot return more than originally sold (${saleProduct.amount} ${saleProduct.unit})`
+      )
+    }
+
+    // Calculate refund amount based on returned quantity
+    const refundAmount = round(
+      (returnAmount / saleProduct.amount) * saleProduct.sellPrice
+    )
+
+    // Get warehouse item to update inventory
+    const warehouseResult = await warehouseDB.allDocs({
+      include_docs: true,
+    })
+
+    console.log('Warehouse result:', warehouseResult)
+    console.log('Warehouse rows:', warehouseResult.rows)
+
+    const warehouseItem = warehouseResult.rows
+      .map((row) => row.doc as any as Warehouse)
+      .find((doc) => doc._id === productId)
+
+    if (!warehouseItem) {
+      throw new Error('Product not found in warehouse')
+    }
+
+    // Update warehouse inventory
+    const updatedWarehouseItem = {
+      ...warehouseItem,
+      amount: round(warehouseItem.amount + returnAmount),
+    }
+
+    await warehouseDB.put(updatedWarehouseItem)
+
+    // Update the sale document
+    let updatedSale: any
+
+    if (returnAmount === saleProduct.amount) {
+      // Remove product entirely if all units are returned
+      const updatedProducts = sale.products.filter(
+        (product) => product._id !== productId
+      )
+
+      updatedSale = {
+        ...sale,
+        products: updatedProducts,
+        totalSellPrice: round(sale.totalSellPrice - refundAmount),
+      }
+    } else {
+      // Reduce product amount if partial return
+      const updatedProducts = [...sale.products]
+      updatedProducts[productIndex] = {
+        ...saleProduct,
+        amount: round(saleProduct.amount - returnAmount),
+      }
+
+      updatedSale = {
+        ...sale,
+        products: updatedProducts,
+        totalSellPrice: round(sale.totalSellPrice - refundAmount),
+      }
+    }
+
+    // Update customer debt if applicable
+    if (sale.customer) {
+      const customer = (await customersDB.get(sale.customer)) as Customer
+
+      if (customer) {
+        const updatedCustomer = {
+          ...customer,
+          debt: round(customer.debt - refundAmount),
+        }
+        await customersDB.put(updatedCustomer)
+      }
+    }
+
+    // Save the updated sale document
+    await salesDB.put(updatedSale)
+
+    return updatedSale
+  } catch (error) {
+    console.error('Error processing product return:', error)
+    throw new Error(error instanceof Error ? error.message : String(error))
   }
 }

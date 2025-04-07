@@ -2,9 +2,13 @@
 
 import { Customer, Sale } from '@/db/schemas'
 
-const PrintComponent = ({customer, sale}: {customer: Customer, sale: Sale}) => {
-console.log(sale);
-
+const PrintComponent = ({
+  customer,
+  sale,
+}: {
+  customer: Customer
+  sale: Sale
+}) => {
   return (
     <div className='w-[50%] bg-background pt-6 text-[10px] mx-auto'>
       <div className='w-full flex justify-between border-b pb-1'>
@@ -44,9 +48,12 @@ console.log(sale);
       </table>
       <div className='w-full flex items-center gap-6 mt-2'>
         <span className='pr-2 border-r'>
-          Umumiy summa: {new Intl.NumberFormat('en-US').format(sale.totalSellPrice)}
+          Umumiy summa:{' '}
+          {new Intl.NumberFormat('en-US').format(sale.totalSellPrice)}
         </span>
-        <span>Naqd: {new Intl.NumberFormat('en-US').format(sale.payment.cash)}</span>
+        <span>
+          Naqd: {new Intl.NumberFormat('en-US').format(sale.payment.cash)}
+        </span>
         <span>
           Plastik: {new Intl.NumberFormat('en-US').format(sale.payment.card)}
         </span>

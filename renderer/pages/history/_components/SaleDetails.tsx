@@ -4,12 +4,30 @@ import { Customer, Intake, Sale } from '@/db/schemas'
 import PrintComponent from './PrintComponent'
 import React, { useEffect, useRef, useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
+import { returnProductFromSale } from '@/db/functions/saleFns'
+import { useRouter } from 'next/router'
+
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
+import { useToast } from '@/components/ui/use-toast'
 
 interface Props {
   active: Sale | Intake | null
 }
 
 const SaleDetails = ({ active }: Props) => {
+  const { toast } = useToast()
+  const { reload } = useRouter()
+  const [isOpen, setOpen] = useState(false)
+  const [selectedItem, setSelectedItem] = useState<string>('')
+  const [returnAmount, setReturnAmount] = useState(0)
   const printRef = useRef<HTMLDivElement | null>(null)
   const [sale, setSale] = useState<Sale | null>(
     active && 'customer' in active ? (active as Sale) : null
@@ -35,9 +53,86 @@ const SaleDetails = ({ active }: Props) => {
     onAfterPrint: () => {},
   })
 
+  const handleConfirm = async () => {
+    try {
+      if (!selectedItem || !returnAmount) return
+      if (
+        returnAmount >
+        sale?.products.find((p) => p._id === selectedItem)?.amount
+      )
+        return toast({
+          title:
+            "Qaytariladigan miqdor sotib olingan miqdordan ko'p bo'lmasligi kerak",
+          variant: 'destructive',
+        })
+      if (returnAmount <= 0) return
+
+      console.log('Selected item:', selectedItem)
+      console.log('Return amount:', returnAmount)
+
+      await returnProductFromSale(
+        sale?._id as string,
+        selectedItem,
+        returnAmount
+      )
+      reload()
+      // const newFodler = await createFolder(folderName, folderParent)
+      // setCategory(newFodler._id)
+    } catch (error) {
+      console.error('Error returning product:', error)
+      toast({
+        title: 'Mahsulotni qaytarishda xatolik yuz berdi',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const handleCancel = () => {
+    setOpen(false)
+    setSelectedItem('')
+    setReturnAmount(0)
+  }
+
   return (
     sale && (
       <>
+        <Dialog open={isOpen} onOpenChange={() => setOpen(false)}>
+          <DialogContent aria-describedby={undefined}>
+            <DialogTitle>Tovarni qaytarish</DialogTitle>
+            <Select
+              value={selectedItem}
+              onValueChange={(v) => setSelectedItem(v)}
+            >
+              <SelectTrigger className='w-full mt-2'>
+                <SelectValue placeholder='Qaysi tovar qaytariladi?' />
+              </SelectTrigger>
+              <SelectContent>
+                {sale?.products.map((f) => (
+                  <SelectItem key={f._id + 'create'} value={f._id}>
+                    {f.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Input
+              autoFocus
+              type='number'
+              value={returnAmount}
+              min={0}
+              max={sale?.products.find((p) => p._id === selectedItem)?.amount}
+              placeholder='Qancha qaytariladi?'
+              // onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
+              onChange={(e) => setReturnAmount(Number(e.target.value))}
+            />
+
+            <div className='mt-4 flex justify-between'>
+              <Button onClick={handleConfirm}>OK</Button>
+              <Button variant='secondary' onClick={handleCancel}>
+                Bekor qilish
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
         <div ref={printRef} className='w-full absolute top-0 -z-50 left-0'>
           {sale?._id && customer?._id && (
             <PrintComponent customer={customer} sale={sale} />
@@ -47,7 +142,9 @@ const SaleDetails = ({ active }: Props) => {
           <div className='flex flex-row items-center justify-between'>
             <h1 className='text-3xl'>Savdo tafsilotlari</h1>
             <div>
-              <Button className='mr-4'>Возврат</Button>
+              <Button className='mr-4' onClick={() => setOpen(true)}>
+                Возврат
+              </Button>
               <Button onClick={handlePrint}>Chop Etish</Button>
             </div>
           </div>
