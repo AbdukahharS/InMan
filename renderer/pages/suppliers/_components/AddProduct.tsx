@@ -138,7 +138,7 @@ const AddProduct = () => {
               {folders
                 ?.filter((f) => !f.parent)
                 .map((f) => (
-                  <SelectItem key={f._id} value={f._id}>
+                  <SelectItem key={f._id + 'create'} value={f._id}>
                     {f.name}
                   </SelectItem>
                 ))}
