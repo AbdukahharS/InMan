@@ -67,13 +67,16 @@ const Page = () => {
     )
     if (!approval) return
     try {
-      await Promise.all(
-        saleProducts.map((p) => {
-          const prevSaleAmount =
-            salePrev.products.find((b) => b._id === p._id)?.amount || 0
-          subtractFromWarehouse(p._id, p.amount - prevSaleAmount)
-        })
-      )
+      for (const p of saleProducts) {
+        const prevSaleAmount =
+          salePrev.products.find((b) => b._id === p._id)?.amount || 0
+        console.log(prevSaleAmount)
+
+        if (p.amount !== prevSaleAmount) {
+          await subtractFromWarehouse(p._id, p.amount - prevSaleAmount)
+        }
+      }
+      
 
       if (!!salePrev._id) {
         await updateCustomerDebt(
@@ -149,7 +152,7 @@ const Page = () => {
           className='z-10 bg-background'
         >
           <ResizablePanel minSize={30}>
-            <div className='w-full h-full overflow-x-auto flex flex-col'>
+            <div className='w-full h-full max-h-full overflow-x-auto flex flex-col overflow-y-auto'>
               <ResizablePanelGroup direction='horizontal'>
                 <ResizablePanel defaultSize={30} minSize={20}>
                   <Folders />

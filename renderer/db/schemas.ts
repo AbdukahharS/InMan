@@ -53,20 +53,21 @@ export interface Customer {
 }
 
 export interface Sale {
-  _id: string;
-  customer: string;
+  _id: string
+  customer: string
+  preDebt: number
   products: {
-    _id: string;
-    name: string;
-    amount: number;
-    sellPrice: number;
-    unit: 'piece' | 'm' | 'kg' | 'm2';
-  }[];
-  totalSellPrice: number;
+    _id: string
+    name: string
+    amount: number
+    sellPrice: number
+    unit: 'piece' | 'm' | 'kg' | 'm2'
+  }[]
+  totalSellPrice: number
   payment: {
-    cash: number;
-    card: number;
-  };
+    cash: number
+    card: number
+  }
   timeStamp: string
 }
 
@@ -139,22 +140,25 @@ export const customerSchema = Joi.object<Customer>({
 export const saleSchema = Joi.object<Sale>({
   _id: Joi.string().default(() => uuidv4()), // Generate a default ID
   customer: Joi.string().required(),
-  products: Joi.array().items(
-    Joi.object({
-      _id: Joi.string().required(),
-      name: Joi.string().required(),
-      amount: Joi.number().required(),
-      sellPrice: Joi.number().required(),
-      unit: Joi.string().valid('piece', 'm', 'kg', 'm2').required(),
-    })
-  ).required(),
+  preDebt: Joi.number().required(),
+  products: Joi.array()
+    .items(
+      Joi.object({
+        _id: Joi.string().required(),
+        name: Joi.string().required(),
+        amount: Joi.number().required(),
+        sellPrice: Joi.number().required(),
+        unit: Joi.string().valid('piece', 'm', 'kg', 'm2').required(),
+      })
+    )
+    .required(),
   totalSellPrice: Joi.number().required(),
   payment: Joi.object({
     cash: Joi.number().required(),
     card: Joi.number().required(),
   }).required(),
-  timeStamp: Joi.string().default(today)
-});
+  timeStamp: Joi.string().default(today),
+})
 
 export const folderSchema = Joi.object<Folder>({
   _id: Joi.string().default(() => uuidv4()), // Generate a default ID

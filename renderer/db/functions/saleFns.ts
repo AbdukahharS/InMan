@@ -44,14 +44,14 @@ export const performSale = async (args: {
 }) => {
   try {
     // Get the customer document
-    const cust = await customersDB
-      .get(args.customer) as Customer
+    const cust = (await customersDB.get(args.customer)) as Customer
     if (!cust) throw new Error('Customer not found')
 
     // Insert the sale into salesDB
     const saleDocument = {
       timeStamp: args.timeStamp,
       customer: args.customer,
+      preDebt: cust.debt,
       products: args.products,
       totalSellPrice: round(args.totalSellPrice),
       payment: args.payment,
@@ -87,16 +87,60 @@ function parseDate(dateString: string) {
 export const getSalesInDateRange = async (start: number, end: number) => {
   try {
     const allDocs = await salesDB.allDocs({ include_docs: true })
-    const filteredDocs = allDocs.rows.map((row) => row.doc as any as Sale).filter(
-      (row) =>
-        parseDate(row.timeStamp) >= start &&
-        parseDate(row.timeStamp) <= end
-    )
+    const filteredDocs = allDocs.rows
+      .map((row) => row.doc as any as Sale)
+      .filter((row) => {
+        if (row.timeStamp) {
+          const date = parseDate(row.timeStamp)
+          return date >= start && date <= end
+        }
+      })
 
     return filteredDocs
   } catch (error) {
     console.error('Error fetching sales in date range', error)
     throw new Error('Error fetching sales in date range')
+  }
+}
+
+export const getCustomerSaleRanking = async (start: number, end: number) => {
+  try {
+    const allCustomerDocs = await customersDB.allDocs({ include_docs: true })
+    const allSaleDocs = await salesDB.allDocs({ include_docs: true })
+    const salesInRange = allSaleDocs.rows
+      .map((row) => row.doc as any as Sale)
+      .filter((row) => {
+        if (row.timeStamp) {
+          const date = parseDate(row.timeStamp)
+          return date >= start && date <= end
+        }
+      })
+
+    const customers = allCustomerDocs.rows.map(
+      (row) => row.doc as any as Customer
+    )
+    const ranking: { _id: string; name: string; total: number }[] = []
+    customers.forEach((cust) => {
+      const doc = {
+        _id: cust._id,
+        name: cust.name,
+        total: 0,
+      }
+      salesInRange.forEach((sale) => {
+        if (sale.customer === doc._id) {
+          doc.total += sale.totalSellPrice
+        }
+      })
+
+      ranking.push(doc)
+    })
+
+    ranking.sort((a, b) => b.total - a.total)
+
+    return ranking
+  } catch (error) {
+    throw new Error('Error fetching customer sale ranking', error)
+    return []
   }
 }
 

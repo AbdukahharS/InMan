@@ -50,7 +50,7 @@ const IntakeList = ({ start, end, active, handleClick }: Props) => {
         </table>
       ) : (
         <p className='text-center text-xl flex-1 mt-8'>
-          Sizda hech qanday mijoz mavjud emas
+          Sizda kiritilgan vaqt ichida kirim topilmadi
         </p>
       )}
     </div>

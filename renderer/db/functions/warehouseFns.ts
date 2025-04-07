@@ -108,11 +108,80 @@ export const getWarehouseItem = async (_id: string) => {
   }
 }
 
+export const updateItemFolder = async (_id: string, folder: string) => {
+  try {
+    const result = await warehouseDB.allDocs({
+      include_docs: true,
+    })
+    const existingDocument = result.rows
+      .map((row) => row.doc as any as Warehouse)
+      .find((doc) => doc.productId === _id)
+
+    if (!existingDocument) {
+      throw new Error('Bunday mahsulot omborda topilmadi')
+    }
+    const updatedDocument = {
+      ...existingDocument,
+      folder,
+    }
+    await warehouseDB.put(updatedDocument)
+  } catch (error) {
+    console.error('Error updating item folder:', error)
+    throw new Error(error.message)
+  }
+}
+
+export const updateItemSellPrice = async (_id: string, sellPrice: number) => {
+  try {
+    const result = await warehouseDB.allDocs({
+      include_docs: true,
+    })
+    const existingDocument = result.rows
+      .map((row) => row.doc as any as Warehouse)
+      .find((doc) => doc.productId === _id)
+
+    if (!existingDocument) {
+      throw new Error('Bunday mahsulot omborda topilmadi')
+    }
+    const updatedDocument = {
+      ...existingDocument,
+      sellPrice,
+    }
+    await warehouseDB.put(updatedDocument)
+  } catch (error) {
+    console.error('Error updating item sell price:', error)
+    throw new Error(error instanceof Error ? error.message : String(error))
+  }
+}
+
+export const updateItemName = async (_id: string, name: string) => {
+  try {
+    const result = await warehouseDB.allDocs({
+      include_docs: true,
+    })
+    const existingDocument = result.rows
+      .map((row) => row.doc as any as Warehouse)
+      .find((doc) => doc.productId === _id)
+
+    if (!existingDocument) {
+      throw new Error('Bunday mahsulot omborda topilmadi')
+    }
+    const updatedDocument = {
+      ...existingDocument,
+      name,
+    }
+    await warehouseDB.put(updatedDocument)
+  } catch (error) {
+    console.error('Error updating item name:', error)
+    throw new Error(error.message)
+  }
+}
+
 // Subtract a specified amount from a warehouse item
 export const subtractFromWarehouse = async (_id: string, amount: number) => {
   try {
     // Fetch the warehouse document by ID
-    const existingDocument = await warehouseDB.get(_id) as Warehouse
+    const existingDocument = (await warehouseDB.get(_id)) as Warehouse
 
     if (!existingDocument) {
       throw new Error('Bunday mahsulot omborda topilmadi') // Product not found in the warehouse
@@ -134,6 +203,7 @@ export const subtractFromWarehouse = async (_id: string, amount: number) => {
       ...existingDocument,
       amount: round(existingDocument.amount - amount),
     }
+    console.log(existingDocument, updatedDocument)
 
     // Save the updated document in PouchDB
     await warehouseDB.put(updatedDocument)

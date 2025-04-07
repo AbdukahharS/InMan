@@ -1,4 +1,3 @@
-// import { Doc } from '@/convex/_generated/dataModel'
 import CustomerItem from './CustomerItem'
 import { Customer } from '@/db/schemas'
 
@@ -21,12 +20,22 @@ const CustomerList = ({ customers }: Props) => {
           </thead>
           <tbody>
             {customers.map((doc, i) => (
-              <CustomerItem
-                key={doc._id}
-                {...doc}
-                i={i}
-              />
+              <CustomerItem key={doc._id} {...doc} i={i} />
             ))}
+            <tr>
+              <td className='px-2'>{customers.length + 1}</td>
+              <td className='px-2'>
+                <b>Jami qarz:</b>
+              </td>
+              <td></td>
+              <td className='px-2'>
+                <b>
+                  {new Intl.NumberFormat('en-US').format(
+                    customers.reduce((acc, cur) => acc + cur.debt, 0)
+                  )}
+                </b>
+              </td>
+            </tr>
           </tbody>
         </table>
       ) : (

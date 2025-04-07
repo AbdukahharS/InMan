@@ -20,7 +20,7 @@ interface ProductState {
     supplier?: string
     folder?: string
     unit?: 'piece' | 'm' | 'kg' | 'm2'
-  }) => void
+  }) => Promise<void>
   createProduct: (
     name: string,
     buyPrice: number,
@@ -41,16 +41,10 @@ const useProductStore = create<ProductState>((set, get) => ({
     const products = await getProducts()
     set({
       products: products.sort((a, b) => {
-        // First compare by folder
-        if (a.folder < b.folder) return -1
-        if (a.folder > b.folder) return 1
-
-        // If folders are the same, compare by name
-        if (a.name < b.name) return -1
-        if (a.name > b.name) return 1
-
-        // If both folder and name are the same, return 0
-        return 0
+        // First compare by folder using localeCompare
+        return a.folder.localeCompare(b.folder, ['ru', 'en'], {
+          sensitivity: 'base',
+        })
       }),
     })
   },

@@ -37,15 +37,23 @@ const ProductList = ({ search }: { search: string }) => {
           </tr>
         </thead>
         <tbody>
-          {products.length ?
-            products.map((doc, i) => {
-              if (
-                !search ||
-                doc.name.toLowerCase().includes(search.toLowerCase())
-              ) {
-                return <ProductItem key={doc._id} {...doc} i={i} />
-              }
-            }) : null}
+          {products.length
+            ? products
+                .sort((a, b) => {
+                  // First compare by folder using localeCompare
+                  return a.folder.localeCompare(b.folder, ['ru', 'en'], {
+                    sensitivity: 'base',
+                  })
+                })
+                .map((doc, i) => {
+                  if (
+                    !search ||
+                    doc.name.toLowerCase().includes(search.toLowerCase())
+                  ) {
+                    return <ProductItem key={doc._id} {...doc} i={i} />
+                  }
+                })
+            : null}
         </tbody>
       </table>
       {!products.length && (

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
+  AlignStartVertical,
   Download,
   Factory,
   History,
@@ -59,22 +60,23 @@ const Navbar = () => {
         variant: 'destructive',
       })
 
-      const newlogin = await prompt('Yangi login kiritng:')
-      const newpass = await prompt('Yangi parol kiritng:')
+    const newlogin = await prompt('Yangi login kiritng:')
+    const newpass = await prompt('Yangi parol kiritng:')
 
-      if (!newlogin || !newpass) return toast({
+    if (!newlogin || !newpass)
+      return toast({
         title: 'Login va parol kiritilmadi',
         variant: 'destructive',
       })
 
-      window.localStorage.setItem('login', newlogin)
-      window.localStorage.setItem('password', newpass)
+    window.localStorage.setItem('login', newlogin)
+    window.localStorage.setItem('password', newpass)
 
-      toast({
-        title: 'Login va parol muvaffaqiyatli o`zgartirildi',
-      })
-      setLogin('')
-      setPassword('')
+    toast({
+      title: 'Login va parol muvaffaqiyatli o`zgartirildi',
+    })
+    setLogin('')
+    setPassword('')
   }
 
   return (
@@ -121,6 +123,14 @@ const Navbar = () => {
           <Link href='/history' className={getLinkClasses('/history/')}>
             <History className='mr-2 h-6 w-6' />
             <span className='text-lg'>Kirim-chiqim tarixi</span>
+          </Link>
+        </Button>
+        <Separator className='h-6 w-px bg-accent-foreground' />
+
+        <Button asChild variant='link'>
+          <Link href='/ranking' className={getLinkClasses('/ranking/')}>
+            <AlignStartVertical className='mr-2 h-6 w-6' />
+            <span className='text-lg'>Reyting</span>
           </Link>
         </Button>
         <Separator className='h-6 w-px bg-accent-foreground' />

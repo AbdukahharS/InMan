@@ -1,4 +1,3 @@
-// import { Doc, Id } from '@/convex/_generated/dataModel'
 import { cn } from '@/lib/utils'
 import useCustomerStore from '@/store/useCustomerStore'
 
@@ -10,14 +9,8 @@ interface CustomerItemProps {
   i: number
 }
 
-const CustomerItem = ({
-  _id,
-  name,
-  phone,
-  debt,
-  i,
-}: CustomerItemProps) => {
-  const {setActive, active} = useCustomerStore()
+const CustomerItem = ({ _id, name, phone, debt, i }: CustomerItemProps) => {
+  const { setActive, active } = useCustomerStore()
   return (
     <tr
       className={cn(

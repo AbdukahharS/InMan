@@ -39,27 +39,28 @@ export default function Document() {
         <meta name='generator' content={metadata.generator} />
         <meta name='keywords' content={metadata.keywords.join(', ')} />
         {viewport.themeColor.map(({ media, color }, index) => (
-            <meta key={index} name='theme-color' media={media} content={color} />
+          <meta key={index} name='theme-color' media={media} content={color} />
         ))}
         {metadata.authors.map(({ name, url }, index) => (
-            <meta
+          <meta
             key={index}
             name='author'
             content={name}
             {...(url && { href: url })}
-            />
+          />
         ))}
         {metadata.icons.map(({ rel, url }, index) => (
-            <link key={index} rel={rel} href={url} />
+          <link key={index} rel={rel} href={url} />
         ))}
         <link
           href='https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap'
           rel='stylesheet'
-          ></link>
+        ></link>
       </Head>
       <body>
         <Main />
         <NextScript />
+        <script src='https://cdn.jsdelivr.net/npm/pouchdb@9.0.0/dist/pouchdb.min.js'></script>
       </body>
     </Html>
   )

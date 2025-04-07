@@ -6,7 +6,7 @@ const Folder = () => {
   const {folders, setFolder, folder} = useFolderStore()
 
   return (
-    <div className='flex-1 max-h-[100vh] overflow-y-auto'>
+    <div className='flex-1 max-h-full overflow-y-auto'>
       <p className='px-4 py-2 font-bold text-xl'>Papkalar</p>
       {folders?.map((doc) => (
         <div

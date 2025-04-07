@@ -13,6 +13,12 @@ import {
 import { Input } from '@/components/ui/input'
 import useProductStore from '@/store/useProductStore'
 import useFolderStore from '@/store/useFolderStore'
+import {
+  getWarehouseItem,
+  updateItemFolder,
+  updateItemName,
+  updateItemSellPrice,
+} from '@/db/functions/warehouseFns'
 
 interface SupplierProductProps {
   _id: string
@@ -37,8 +43,8 @@ const SupplierProduct = ({
 }: SupplierProductProps) => {
   const [editing, setEditing] = useState(false)
   const [unitstate, setUnit] = useState<'piece' | 'm' | 'kg' | 'm2'>(unit)
-  const {editProduct} = useProductStore()
-  const {folders} = useFolderStore()
+  const { editProduct } = useProductStore()
+  const { folders } = useFolderStore()
 
   const nameInputRef = useRef<HTMLInputElement>(null)
   const buyPriceInputRef = useRef<HTMLInputElement>(null)
@@ -57,30 +63,60 @@ const SupplierProduct = ({
     setEditing(!editing)
   }
 
-  const handleEditSubmit = () => {
+  const handleEditSubmit = async () => {
     if (
       !nameInputRef.current ||
       !buyPriceInputRef.current ||
       !sellPriceInputRef.current
     )
       return
-    setEditing(false)
-    const nameValue = nameInputRef.current.value
-    const buyPriceValue = Number(buyPriceInputRef.current.value)
-    const sellPriceValue = Number(sellPriceInputRef.current.value)
-
-    const updatedProduct = {
-      _id,
-      name: nameValue,
-      supplier,
-      buyPrice: buyPriceValue,
-      sellPrice: sellPriceValue,
-      unit: unitstate,
-      folder: folderState,
-    }
 
     try {
-      editProduct(updatedProduct)
+      const nameValue = nameInputRef.current.value
+      const buyPriceValue = Number(buyPriceInputRef.current.value)
+      const sellPriceValue = Number(sellPriceInputRef.current.value)
+
+      const updatedProduct = {
+        _id,
+        name: nameValue,
+        supplier,
+        buyPrice: buyPriceValue,
+        sellPrice: sellPriceValue,
+        unit: unitstate,
+        folder: folderState,
+      }
+
+      await editProduct(updatedProduct)
+
+      if (folderState !== folder) {
+        const warehouseItem = await getWarehouseItem(_id)
+        if (warehouseItem) {
+          await updateItemFolder(_id, folderState)
+          console.log('folder updated')
+        }
+      }
+      if (sellPriceValue !== sellPrice) {
+        await updateItemSellPrice(_id, sellPriceValue).catch(async (e) => {
+          toast({
+            title: 'Xatolik',
+            description: e.message,
+            variant: 'destructive',
+          })
+        })
+        console.log('sell price updated')
+      }
+      if (nameValue !== name) {
+        await updateItemName(_id, nameValue).catch(async (e) => {
+          toast({
+            title: 'Xatolik',
+            description: e.message,
+            variant: 'destructive',
+          })
+        })
+        console.log('name updated')
+      }
+
+      setEditing(false) // Moved after all async operations complete successfully
     } catch (error) {
       toast({
         title: 'Xatolik',
@@ -140,10 +176,7 @@ const SupplierProduct = ({
       </td>
       <td className='px-2'>
         {editing ? (
-          <Select
-            value={folderState || ''}
-            onValueChange={setfolderState}
-          >
+          <Select value={folderState || ''} onValueChange={setfolderState}>
             <SelectTrigger>
               <SelectValue placeholder="O'lchov birligi" />
             </SelectTrigger>

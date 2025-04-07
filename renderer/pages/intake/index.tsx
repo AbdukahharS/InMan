@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   ResizableHandle,
@@ -16,9 +16,12 @@ import { useToast } from '@/components/ui/use-toast'
 import useIntake from '@/store/useIntakeStore'
 import Navbar from '@/components/layout/Navbar'
 import { useConfirm } from '@/hooks/useConfirm'
+import usePrompt from '@/hooks/usePrompt'
 
 const Page = () => {
+  const [loading, setLoading] = useState(true)
   const confirm = useConfirm()
+  const prompt = usePrompt()
   const [search, setSearch] = useState('')
   const {
     supplier,
@@ -29,6 +32,29 @@ const Page = () => {
     addToWarehouse,
   } = useIntake()
   const { toast } = useToast()
+
+  useEffect(() => {
+    const askPassword = async () => {
+      const pass = window.localStorage.getItem('password') || 'm'
+      let input = ''
+
+      while (input !== pass) {
+        input = await prompt('Parolni kiriting:')
+        if (input !== pass) {
+          toast({
+            title: 'Parol noto`g`ri kiritildi',
+            variant: 'destructive',
+          })
+        } else {
+          console.log(1)
+          setLoading(false)
+          break
+        }
+      }
+    }
+
+    askPassword()
+  }, [])
 
   const handleSubmit = async () => {
     if (!supplier) return
@@ -52,7 +78,7 @@ const Page = () => {
   return (
     <div className='h-[100vh]'>
       <Navbar />
-      <main className='h-full pt-10'>
+      <main className={`h-full pt-10 ${loading ? 'hidden' : 'block'}`}>
         <ResizablePanelGroup direction='horizontal'>
           <ResizablePanel minSize={30}>
             <div className='w-full h-full overflow-x-auto flex flex-col'>

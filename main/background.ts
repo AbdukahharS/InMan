@@ -6,31 +6,33 @@ import { createWindow } from './helpers'
 const isProd = process.env.NODE_ENV === 'production'
 
 if (isProd) {
-  app.setPath('userData', path.join('D:', 'InMan', 'userData'));
+  app.setPath('userData', path.join('D:', 'InMan', 'userData'))
   serve({ directory: 'app' })
 } else {
-  app.setPath('userData', `${path.join('D:', 'InMan', 'userData')} (development)`)
+  app.setPath(
+    'userData',
+    `${path.join('D:', 'InMan', 'userData')} (development)`
+  )
 }
 
 ;(async () => {
   await app.whenReady()
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize
 
   const mainWindow = createWindow('main', {
     width,
     height,
-    // resizable: false,
     maximizable: true,
-    
+    icon: path.join(__dirname, 'public/icons/icon.png'),
+
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
   })
-  
-  // Disable the menu bar
-  mainWindow.setMenuBarVisibility(false);
-  mainWindow.maximize()
 
+  // Disable the menu bar
+  mainWindow.setMenuBarVisibility(false)
+  mainWindow.maximize()
 
   if (isProd) {
     await mainWindow.loadURL('app://./')

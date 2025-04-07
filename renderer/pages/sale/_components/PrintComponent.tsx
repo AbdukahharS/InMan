@@ -33,7 +33,7 @@ const PrintComponent = () => {
                 {new Intl.NumberFormat('en-US').format(p.sellPrice)}
               </td>
               <td className='px-1'>
-                {p.amount} {p.unit === 'piece' ? 'ta' : p.unit}
+                {p.amount} {p.unit === 'piece' ? 'Шт' : p.unit}
               </td>
               <td className='px-1'>
                 {new Intl.NumberFormat('en-US').format(p.sellPrice * p.amount)}

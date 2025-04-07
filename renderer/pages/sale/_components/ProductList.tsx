@@ -5,11 +5,11 @@ const ProductList = () => {
   const { warehouse, folder } = useSale()
 
   return (
-    <div className='flex-1 overflow-y-auto'>
+    <div className='flex-1 overflow-y-auto max-h-full'>
       {!folder?._id ? (
         <p className='text-center text-xl flex-1 mt-8'>Papka tanlang</p>
-      ): warehouse?.length ? (
-        <table className='w-full overflow-y-auto table-auto'>
+      ) : warehouse?.length ? (
+        <table className='w-full table-auto'>
           <thead>
             <tr>
               <th>No</th>

@@ -22,6 +22,7 @@ interface SaleItemProps {
     cash: number
   }
   customer: string
+  preDebt: number
 }
 
 const SaleItem = ({
@@ -34,6 +35,7 @@ const SaleItem = ({
   active,
   payment,
   customer,
+  preDebt,
 }: SaleItemProps) => {
   const [customerObj, setCustomerObj] = useState<Customer | null>(null)
 
@@ -49,7 +51,18 @@ const SaleItem = ({
         'w-full h-8 cursor-pointer hover:bg-primary-foreground',
         active?._id === _id && 'bg-primary-foreground'
       )}
-      onClick={() => handleClick({ _id, totalSellPrice, timeStamp, products, customer, payment })}
+      onClick={() =>
+        handleClick({
+          _id,
+          totalSellPrice,
+          timeStamp,
+          products,
+          customer,
+          payment,
+          preDebt,
+        })
+      }
+      data-state={_id}
     >
       <td className='px-2'>{i + 1}</td>
       <td className='px-2'>
