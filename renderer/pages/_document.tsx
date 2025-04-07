@@ -57,7 +57,7 @@ export default function Document() {
           rel='stylesheet'
         ></link>
       </Head>
-      <body>
+      <body className='bg-background'>
         <Main />
         <NextScript />
         <script src='https://cdn.jsdelivr.net/npm/pouchdb@9.0.0/dist/pouchdb.min.js'></script>
