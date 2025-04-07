@@ -72,8 +72,9 @@ export interface Sale {
 }
 
 export interface Folder {
-  _id: string;
-  name: string;
+  _id: string
+  name: string
+  parent?: string | null
 }
 
 // Define the schema for validation using Joi
@@ -82,7 +83,7 @@ export const supplierSchema = Joi.object<Supplier>({
   name: Joi.string().required(),
   phone: Joi.string().allow(''),
   _rev: Joi.string(),
-});
+})
 
 export const productSchema = Joi.object<Product>({
   _id: Joi.string().default(() => uuidv4()), // Generate a default ID
@@ -92,7 +93,7 @@ export const productSchema = Joi.object<Product>({
   supplier: Joi.string().required(),
   folder: Joi.string().required(),
   unit: Joi.string().valid('piece', 'm', 'kg', 'm2').required(),
-});
+})
 
 function today() {
   const d = new Date()
@@ -106,18 +107,20 @@ function today() {
 export const intakeSchema = Joi.object<Intake>({
   _id: Joi.string().default(() => uuidv4()), // Generate a default ID
   supplier: Joi.string().required(),
-  products: Joi.array().items(
-    Joi.object({
-      _id: Joi.string().required(),
-      name: Joi.string().required(),
-      buyPrice: Joi.number().required(),
-      unit: Joi.string().valid('piece', 'm', 'kg', 'm2').required(),
-      amount: Joi.number().required(),
-    })
-  ).required(),
+  products: Joi.array()
+    .items(
+      Joi.object({
+        _id: Joi.string().required(),
+        name: Joi.string().required(),
+        buyPrice: Joi.number().required(),
+        unit: Joi.string().valid('piece', 'm', 'kg', 'm2').required(),
+        amount: Joi.number().required(),
+      })
+    )
+    .required(),
   totalBuyPrice: Joi.number().required(),
-  timeStamp: Joi.string().default(today)
-});
+  timeStamp: Joi.string().default(today),
+})
 
 export const warehouseSchema = Joi.object<Warehouse>({
   _id: Joi.string().default(() => uuidv4()),
@@ -128,14 +131,14 @@ export const warehouseSchema = Joi.object<Warehouse>({
   amount: Joi.number().required(),
   unit: Joi.string().valid('piece', 'm', 'kg', 'm2').required(),
   sellPrice: Joi.number().required(),
-});
+})
 
 export const customerSchema = Joi.object<Customer>({
   _id: Joi.string().default(() => uuidv4()), // Generate a default ID
   name: Joi.string().required(),
   phone: Joi.string().allow(''),
   debt: Joi.number().required(),
-});
+})
 
 export const saleSchema = Joi.object<Sale>({
   _id: Joi.string().default(() => uuidv4()), // Generate a default ID
@@ -163,4 +166,5 @@ export const saleSchema = Joi.object<Sale>({
 export const folderSchema = Joi.object<Folder>({
   _id: Joi.string().default(() => uuidv4()), // Generate a default ID
   name: Joi.string().required(),
-});
+  parent: Joi.string().allow(null, ''),
+})

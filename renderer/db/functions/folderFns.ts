@@ -61,7 +61,7 @@ export const updateFolder = async (args: {
 }
 
 // Function to create a new folder
-export const createFolder = async (name: string) => {
+export const createFolder = async (name: string, parent: string | null) => {
   const { error } = folderSchema.validate({ name })
   if (error) {
     throw new Error(error.message)
@@ -70,6 +70,7 @@ export const createFolder = async (name: string) => {
   const document = {
     _id: uuidv4(), // Generate a unique ID for the new folder
     name,
+    parent, // Set the parent folder ID
   }
 
   try {

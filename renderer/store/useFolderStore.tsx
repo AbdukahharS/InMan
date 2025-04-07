@@ -1,12 +1,15 @@
 import { create } from 'zustand'
-import { createFolder, getFolders } from '../db/functions/folderFns'
+import {
+  createFolder as addFolder,
+  getFolders,
+} from '../db/functions/folderFns'
 import { Folder } from '../db/schemas' // Import the types
 
 interface FolderState {
   folders: Folder[]
   active: Folder | null
   fetchFolders: () => void
-  createFolder: (name: string) => Promise<Folder>
+  createFolder: (name: string, parent?: string) => Promise<Folder>
   setActive: (folder: Folder | null) => void
 }
 
@@ -21,8 +24,8 @@ const useFolderStore = create<FolderState>((set, get) => ({
   },
 
   // Create a new folder
-  createFolder: async (name: string) => {
-    const newFolder = await createFolder(name)
+  createFolder: async (name: string, parent: string | undefined) => {
+    const newFolder = await addFolder(name, parent)
     set((state) => ({
       folders: [...state.folders, newFolder as Folder],
     }))

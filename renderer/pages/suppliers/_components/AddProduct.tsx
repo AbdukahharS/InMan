@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 
 import {
   Select,
@@ -25,6 +26,9 @@ const AddProduct = () => {
   const { active } = useSupplierStore()
   const { createProduct } = useProductStore()
   const [name, setName] = useState('')
+  const [folderName, setFolderName] = useState('')
+  const [folderParent, setFolderParent] = useState('')
+  const [isOpen, setOpen] = useState(false)
   const [buyPrice, setBuyPrice] = useState(0)
   const [sellPrice, setSellPrice] = useState(0)
   const [unit, setUnit] = useState<'piece' | 'm' | 'kg' | 'm2'>('piece')
@@ -33,6 +37,8 @@ const AddProduct = () => {
   )
 
   const { toast } = useToast()
+
+  // console.log(folders)
 
   useEffect(() => {
     fetchFolders()
@@ -83,17 +89,69 @@ const AddProduct = () => {
     if (v === null) {
       return
     } else if (v === 'new') {
-      let name = await prompt('Papkani nomini kiriting')
-      if (!name) return
-      const newFodler = await createFolder(name)
-      setCategory(newFodler._id)
+      setOpen(true)
+      // let name = await prompt('Papkani nomini kiriting')
+      // if (!name) return
+      // const newFodler = await createFolder(name)
+      // setCategory(newFodler._id)
     } else {
       setCategory(v)
     }
   }
 
+  const handleConfirm = async () => {
+    if (!folderName) return
+    const newFodler = await createFolder(folderName, folderParent)
+    setCategory(newFodler._id)
+    setOpen(false)
+    setFolderName('')
+    setFolderParent('')
+  }
+
+  const handleCancel = () => {
+    setOpen(false)
+    setFolderName('')
+    setFolderParent('')
+  }
+
   return (
     <div className='w-full p-2 border-t-2'>
+      <Dialog open={isOpen} onOpenChange={() => setOpen(false)}>
+        <DialogContent aria-describedby={undefined}>
+          <DialogTitle>Yangi Papka qo'shish</DialogTitle>
+          <Input
+            autoFocus
+            type='text'
+            value={folderName}
+            placeholder='Yangi papka nomi'
+            // onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
+            onChange={(e) => setFolderName(e.target.value)}
+          />
+          <Select
+            value={folderParent}
+            onValueChange={(v) => setFolderParent(v)}
+          >
+            <SelectTrigger className='w-full mt-2'>
+              <SelectValue placeholder='Yangi papka biror papkaning ichidami?' />
+            </SelectTrigger>
+            <SelectContent>
+              {folders
+                ?.filter((f) => !f.parent)
+                .map((f) => (
+                  <SelectItem key={f._id} value={f._id}>
+                    {f.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+          <div className='mt-4 flex justify-between'>
+            <Button onClick={handleConfirm}>OK</Button>
+            <Button variant='secondary' onClick={handleCancel}>
+              Bekor qilish
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <div className='flex flex-row gap-2 items-center'>
         <div className='grid w-full items-center gap-1.5'>
           <Label htmlFor='name'>Mahsulot nomi</Label>
@@ -147,11 +205,26 @@ const AddProduct = () => {
               <SelectValue placeholder='Papkani tanlang' />
             </SelectTrigger>
             <SelectContent>
-              {folders?.map((c) => (
-                <SelectItem key={c._id} value={c._id}>
-                  {c.name}
-                </SelectItem>
-              ))}
+              {folders
+                ?.filter((c) => !c.parent)
+                .map((c) => (
+                  <>
+                    <SelectItem key={c._id} value={c._id}>
+                      {c.name}
+                    </SelectItem>
+                    {folders
+                      .filter((f) => f.parent === c._id)
+                      .map((f) => (
+                        <SelectItem
+                          key={f._id}
+                          value={f._id}
+                          className='bg-gray-100/40'
+                        >
+                          - {f.name}
+                        </SelectItem>
+                      ))}
+                  </>
+                ))}
               <SelectItem value='new'>Yangi papka qo'shish</SelectItem>
             </SelectContent>
           </Select>
