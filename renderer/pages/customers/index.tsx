@@ -16,6 +16,7 @@ import CustomerList from './_components/CustomerList'
 import AddCustomer from './_components/AddCustomer'
 import EditCustomer from './_components/EditCustomer'
 import Navbar from '@/components/layout/Navbar'
+import CustomerHistory from './_components/CustomerHistory'
 
 const Page = () => {
   // const docs = useQuery(api.documents.getCustomers)
@@ -53,9 +54,10 @@ const Page = () => {
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel minSize={30}>
-            <div className='w-full h-full overflow-x-auto flex flex-col'>
+            <div className='w-full h-full overflow-x-auto flex flex-col overflow-y-auto'>
               <div className='w-full flex-1'>
                 {!!active && <EditCustomer customer={active} />}
+                {!!active && <CustomerHistory customer={active} />}
               </div>
               <AddCustomer />
             </div>

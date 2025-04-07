@@ -23,6 +23,9 @@ const EditCustomer = ({ customer }: { customer: Customer}) => {
   return (
     <div className='w-full flex flex-col gap-4 p-6'>
       <div className='grid w-full items-center gap-1.5'>
+        <h1 className='text-2xl font-semibold text-center'>
+          Mijoz ma'lumotlari
+        </h1>
         <Label htmlFor='name'>Mijoz ismi</Label>
         <Input
           id='name'
@@ -38,7 +41,9 @@ const EditCustomer = ({ customer }: { customer: Customer}) => {
           onChange={(e) => setPhone(e.target.value)}
         />
       </div>
-      <div>Qarz: {new Intl.NumberFormat('en-US').format(customer?.debt || 0)}</div>
+      <div>
+        Qarz: {new Intl.NumberFormat('en-US').format(customer?.debt || 0)}
+      </div>
       <Button onClick={handleSubmit}>O'zgartirish</Button>
     </div>
   )

@@ -40,11 +40,21 @@ const FilterBar = ({ type, setType, start, setStart, end, setEnd }: Props) => {
       </Select>
       <div className='flex flex-row items-center gap-3'>
         <Label htmlFor='start'>Boshlash:</Label>
-        <Input value={start} name='start' onChange={handleChange} />
+        <Input
+          value={start}
+          name='start'
+          onChange={handleChange}
+          className='w-[100px]'
+        />
       </div>
       <div className='flex flex-row items-center gap-3'>
         <Label htmlFor='end'>Tugash:</Label>
-        <Input value={end} name='end' onChange={handleChange} />
+        <Input
+          value={end}
+          name='end'
+          onChange={handleChange}
+          className='w-[100px]'
+        />
       </div>
     </div>
   )

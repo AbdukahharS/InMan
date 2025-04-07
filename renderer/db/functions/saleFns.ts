@@ -103,6 +103,25 @@ export const getSalesInDateRange = async (start: number, end: number) => {
     throw new Error('Error fetching sales in date range')
   }
 }
+// Get sales within a date range of a customer
+export const getSalesInDateRangeCustomer = async (start: number, end: number, customerId: string) => {
+  try {
+    const allDocs = await salesDB.allDocs({ include_docs: true })
+    const filteredDocs = allDocs.rows
+      .map((row) => row.doc as any as Sale)
+      .filter((row) => {
+        if (row.timeStamp) {
+          const date = parseDate(row.timeStamp)
+          return date >= start && date <= end
+        }
+      })
+
+    return filteredDocs.filter((row) => row.customer === customerId)
+  } catch (error) {
+    console.error('Error fetching sales in date range', error)
+    throw new Error('Error fetching sales in date range')
+  }
+}
 
 export const getCustomerSaleRanking = async (start: number, end: number) => {
   try {
