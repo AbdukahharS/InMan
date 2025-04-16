@@ -9,7 +9,7 @@ const PrintComponent = ({
   customer: Customer
   sale: Sale
 }) => {
-  return (
+  return sale?._id && customer?._id ? (
     <div className='w-[50%] bg-background pt-6 text-[10px] mx-auto'>
       <div className='w-full flex justify-between border-b pb-1'>
         <b>{customer?.name}</b>
@@ -59,7 +59,7 @@ const PrintComponent = ({
         </span>
       </div>
     </div>
-  )
+  ) : null
 }
 
 export default PrintComponent
