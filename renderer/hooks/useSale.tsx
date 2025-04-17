@@ -14,6 +14,7 @@ const useSale = () => {
     fetchFolders,
     setActive: setFolder,
     active: folder,
+    updateFolder,
   } = useFolderStore()
   const { products: warehouse, setProducts } = useWarehouseStore()
   const {
@@ -78,6 +79,8 @@ const useSale = () => {
 
   return {
     folders,
+    fetchFolders,
+    updateFolder,
     setFolder,
     folder,
     warehouse,

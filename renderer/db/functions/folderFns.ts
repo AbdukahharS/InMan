@@ -31,10 +31,12 @@ export const getFolders = async () => {
 export const updateFolder = async (args: {
   _id: string
   name?: string
-  parentId?: string
+  parent?: string
 }) => {
   const { error } = folderSchema.validate(args)
   if (error) {
+    console.log(error)
+
     throw new Error('Invalid input')
   }
 
