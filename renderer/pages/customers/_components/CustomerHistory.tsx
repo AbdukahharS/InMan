@@ -1,11 +1,24 @@
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { toast } from '@/components/ui/use-toast'
 import { getSalesInDateRangeCustomer } from '@/db/functions/saleFns'
 import { Customer, Sale } from '@/db/schemas'
 import SaleItem from '@/pages/history/_components/SaleItem'
 import { ArrowLeft } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import { useReactToPrint } from 'react-to-print'
+import React, { useEffect, useRef, useState } from 'react'
+import { returnProductFromSale } from '@/db/functions/saleFns'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
+import PrintComponent from './PrintComponent'
 
 function today() {
   const d = new Date()
@@ -32,10 +45,15 @@ type Numbers = {
 }
 
 const CustomerHistory = ({ customer }: { customer: Customer }) => {
+  const { reload } = useRouter()
   const [start, setStart] = React.useState(today())
   const [end, setEnd] = React.useState(today())
   const [sales, setSales] = useState<Sale[]>()
   const [active, setActive] = useState<Sale | null>(null)
+  const printRef = useRef<HTMLDivElement | null>(null)
+  const [isOpen, setOpen] = useState(false)
+  const [selectedItem, setSelectedItem] = useState<string>('')
+  const [returnAmount, setReturnAmount] = useState(0)
 
   useEffect(() => {
     getSalesInDateRangeCustomer(
@@ -74,11 +92,103 @@ const CustomerHistory = ({ customer }: { customer: Customer }) => {
     setActive(sale)
   }
 
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    onAfterPrint: () => {},
+  })
+
+  const handleConfirm = async () => {
+    try {
+      if (!selectedItem || !returnAmount) return
+      if (
+        returnAmount >
+        active?.products.find((p) => p._id === selectedItem)?.amount
+      )
+        return toast({
+          title:
+            "Qaytariladigan miqdor sotib olingan miqdordan ko'p bo'lmasligi kerak",
+          variant: 'destructive',
+        })
+      if (returnAmount <= 0) return
+
+      await returnProductFromSale(
+        active?._id as string,
+        selectedItem,
+        returnAmount
+      )
+      reload()
+      // const newFodler = await createFolder(folderName, folderParent)
+      // setCategory(newFodler._id)
+    } catch (error) {
+      console.error('Error returning product:', error)
+      toast({
+        title: 'Mahsulotni qaytarishda xatolik yuz berdi',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const handleCancel = () => {
+    setOpen(false)
+    setSelectedItem('')
+    setReturnAmount(0)
+  }
+
   return active ? (
     <div className='w-full p-6 overflow-y-auto bg-background border-t'>
+      <div ref={printRef} className='w-full absolute top-0 -z-50 left-0'>
+        {active?._id && customer?._id && (
+          <PrintComponent customer={customer} sale={active} />
+        )}
+      </div>
+      <Dialog open={isOpen} onOpenChange={() => setOpen(false)}>
+        <DialogContent aria-describedby={undefined}>
+          <DialogTitle>Tovarni qaytarish</DialogTitle>
+          <Select
+            value={selectedItem}
+            onValueChange={(v) => setSelectedItem(v)}
+          >
+            <SelectTrigger className='w-full mt-2'>
+              <SelectValue placeholder='Qaysi tovar qaytariladi?' />
+            </SelectTrigger>
+            <SelectContent>
+              {active?.products.map((f) => (
+                <SelectItem key={f._id + 'create'} value={f._id}>
+                  {f.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input
+            autoFocus
+            type='number'
+            value={returnAmount}
+            min={0}
+            max={active?.products.find((p) => p._id === selectedItem)?.amount}
+            placeholder='Qancha qaytariladi?'
+            // onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
+            onChange={(e) => setReturnAmount(Number(e.target.value))}
+          />
+
+          <div className='mt-4 flex justify-between'>
+            <Button onClick={handleConfirm}>OK</Button>
+            <Button variant='secondary' onClick={handleCancel}>
+              Bekor qilish
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <div className='flex flex-row items-center gap-6 mb-2'>
-        <Button onClick={() => setActive(null)}><ArrowLeft /></Button>
+        <Button onClick={() => setActive(null)}>
+          <ArrowLeft />
+        </Button>
         <h1 className='text-3xl'>Savdo tafsilotlari</h1>
+        <div>
+          <Button className='mr-4' onClick={() => setOpen(true)}>
+            Возврат
+          </Button>
+          <Button onClick={handlePrint}>Chop Etish</Button>
+        </div>
       </div>
       <p>
         Savdodan oldingi qarzi:{' '}

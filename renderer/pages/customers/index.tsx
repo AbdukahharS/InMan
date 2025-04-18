@@ -41,7 +41,7 @@ const Page = () => {
   }, [customers, search])
 
   return (
-    <div className='h-[100vh]'>
+    <div className='h-[100vh] bg-background'>
       <Navbar />
       <main className='h-full pt-10'>
         <ResizablePanelGroup direction='horizontal'>

@@ -273,9 +273,7 @@ export const returnProductFromSale = async (
     }
 
     // Calculate refund amount based on returned quantity
-    const refundAmount = round(
-      (returnAmount / saleProduct.amount) * saleProduct.sellPrice
-    )
+    const refundAmount = round(returnAmount * saleProduct.sellPrice)
 
     // Get warehouse item to update inventory
     const warehouseResult = await warehouseDB.allDocs({
