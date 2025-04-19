@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
+import { useReactToPrint } from 'react-to-print'
 
 import Navbar from '@/components/layout/Navbar'
 import { Label } from '@/components/ui/label'
@@ -6,6 +7,8 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { getCustomerSaleRanking } from '@/db/functions/saleFns'
 import { useToast } from '@/components/ui/use-toast'
+import { Printer } from 'lucide-react'
+import RankingPrintComponent from './PrintComponent'
 
 function today() {
   const d = new Date()
@@ -32,6 +35,12 @@ const Ranking = () => {
   const [ranking, setRanking] = useState<Ranking>([])
   const [start, setStart] = useState(today())
   const [end, setEnd] = useState(today())
+  const printRef = useRef<HTMLDivElement | null>(null)
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    onAfterPrint: () => {},
+  })
 
   const handleClick = async () => {
     setLoading(true)
@@ -75,6 +84,12 @@ const Ranking = () => {
             />
           </div>
           <Button onClick={handleClick}>Qidirish</Button>
+          {ranking.length > 0 && (
+            <Button onClick={handlePrint} variant='outline'>
+              <Printer className='h-4 w-4 mr-2' />
+              Chop Etish
+            </Button>
+          )}
         </div>
         {loading ? (
           <div className='h-full flex items-center justify-center text-2xl'>
@@ -91,7 +106,7 @@ const Ranking = () => {
             </thead>
             <tbody>
               {ranking.map((doc, i) => (
-                <tr className='w-full h-8'>
+                <tr className='w-full h-8' key={doc._id}>
                   <td className='px-2'>{i + 1}</td>
                   <td className='px-2'>
                     <div className='w-full truncate'>{doc.name}</div>
@@ -117,6 +132,13 @@ const Ranking = () => {
         ) : (
           ''
         )}
+
+        {/* Hidden print component */}
+        <div className='hidden'>
+          <div ref={printRef}>
+            <RankingPrintComponent ranking={ranking} start={start} end={end} />
+          </div>
+        </div>
       </main>
     </div>
   )
