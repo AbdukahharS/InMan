@@ -23,8 +23,14 @@ const RankingPrintComponent = ({
       <div className='w-full flex justify-between border-b pb-2 mb-4'>
         <h1 className='text-xl font-bold'>Mijoz Savdo Reytingi</h1>
         <div className='text-right'>
-          <div><b>Davr:</b> {start} - {end}</div>
-          {currentDate && <div><b>Sana:</b> {currentDate}</div>}
+          <div>
+            <b>Davr:</b> {start} - {end}
+          </div>
+          {currentDate && (
+            <div>
+              <b>Sana:</b> {currentDate}
+            </div>
+          )}
         </div>
       </div>
       <table className='w-full table-auto mt-3 print-table'>
@@ -36,7 +42,7 @@ const RankingPrintComponent = ({
           </tr>
         </thead>
         <tbody>
-          {ranking.map((doc, i) => (
+          {ranking?.map((doc, i) => (
             <tr key={doc._id}>
               <td className='px-2 py-1'>{i + 1}</td>
               <td className='px-2 py-1'>{doc.name}</td>
@@ -46,10 +52,12 @@ const RankingPrintComponent = ({
             </tr>
           ))}
           <tr>
-            <td colSpan={2} className='px-2 py-1 font-bold text-right'>Jami savdo summasi:</td>
+            <td colSpan={2} className='px-2 py-1 font-bold text-right'>
+              Jami savdo summasi:
+            </td>
             <td className='px-2 py-1 font-bold text-right'>
               {new Intl.NumberFormat('en-US').format(
-                ranking.reduce((a, b) => a + b.total, 0)
+                ranking?.reduce((a, b) => a + b.total, 0)
               )}
             </td>
           </tr>

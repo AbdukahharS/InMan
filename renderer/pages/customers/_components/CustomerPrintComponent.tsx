@@ -25,8 +25,14 @@ const CustomerPrintComponent = ({
       <div className='w-full flex justify-between border-b pb-2 mb-4'>
         <h1 className='text-xl font-bold'>Mijozlar Ro'yxati</h1>
         <div className='text-right'>
-          {currentDate && <div><b>Sana:</b> {currentDate}</div>}
-          <div><b>Jami mijozlar:</b> {customers.length}</div>
+          {currentDate && (
+            <div>
+              <b>Sana:</b> {currentDate}
+            </div>
+          )}
+          <div>
+            <b>Jami mijozlar:</b> {customers?.length}
+          </div>
         </div>
       </div>
       <table className='w-full table-auto mt-3 print-table'>
@@ -39,12 +45,14 @@ const CustomerPrintComponent = ({
           </tr>
         </thead>
         <tbody>
-          {customers.map((customer, i) => (
+          {customers?.map((customer, i) => (
             <tr key={customer._id}>
               <td className='px-2 py-1'>{i + 1}</td>
               <td className='px-2 py-1'>{customer.name}</td>
               <td className='px-2 py-1'>{customer.phone}</td>
-              <td className='px-2 py-1'>{new Intl.NumberFormat('en-US').format(customer.debt)}</td>
+              <td className='px-2 py-1'>
+                {new Intl.NumberFormat('en-US').format(customer.debt)}
+              </td>
             </tr>
           ))}
         </tbody>
