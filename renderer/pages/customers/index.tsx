@@ -1,11 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-// import { useQuery } from 'convex/react'
+import { useEffect, useState, useRef } from 'react'
+import { useReactToPrint } from 'react-to-print'
 
 import useCustomerStore from '@/store/useCustomerStore'
-// import { Doc } from '@/convex/_generated/dataModel'
-// import { api } from '@/convex/_generated/api'
 import {
   ResizableHandle,
   ResizablePanel,
@@ -17,12 +15,18 @@ import AddCustomer from './_components/AddCustomer'
 import EditCustomer from './_components/EditCustomer'
 import Navbar from '@/components/layout/Navbar'
 import CustomerHistory from './_components/CustomerHistory'
+import CustomerPrintComponent from './_components/CustomerPrintComponent'
 
 const Page = () => {
-  // const docs = useQuery(api.documents.getCustomers)
   const { customers, active, fetchCustomers } = useCustomerStore()
   const [docs, setDocs] = useState(customers)
   const [search, setSearch] = useState('')
+  const printRef = useRef<HTMLDivElement | null>(null)
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    onAfterPrint: () => {},
+  })
 
   useEffect(() => {
     fetchCustomers()
@@ -47,9 +51,8 @@ const Page = () => {
         <ResizablePanelGroup direction='horizontal'>
           <ResizablePanel minSize={30}>
             <div className='w-full h-full overflow-x-auto flex flex-col'>
-              <SearchBar setSearch={setSearch} />
+              <SearchBar setSearch={setSearch} onPrint={handlePrint} />
               <CustomerList customers={docs} />
-              {/* <AddSupplier /> */}
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle />
@@ -63,6 +66,13 @@ const Page = () => {
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
+
+        {/* Hidden print component */}
+        <div className='hidden'>
+          <div ref={printRef}>
+            <CustomerPrintComponent customers={docs} />
+          </div>
+        </div>
       </main>
     </div>
   )
