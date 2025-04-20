@@ -1,6 +1,6 @@
 <img src="https://avatars.githubusercontent.com/u/75196660?s=120&v=4" align="right" height="70" width="70" border-radius="50%">
 
-##### Shahzod Abdukahhar <kbd>[Github](https://github.com/Abdukahhar) / [LinkedIn](https://www.linkedin.com/in/shakhzodbek-kakhkhorov-217ab9265/)  / [Telegram](https://t.me/shahzod_qaxxorov) /  [E-Mail](mailto:shakhzodbekkakhkhorov04@gmail.com)</kbd>
+##### Shahzod Abdukahhar <kbd>[Github](https://github.com/AbdukahharS) / [LinkedIn](https://www.linkedin.com/in/shahzod-kahhorov/)  / [Telegram](https://t.me/shahzod_qaxxorov) /  [E-Mail](mailto:shahzod@abdukahhar.com)</kbd>
 
 # InMan
 
