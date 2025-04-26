@@ -378,64 +378,63 @@ const Navbar = () => {
           </Dialog>
         </div>
       </nav>
-      <div
-        className='absolute top-0 -z-50 left-0 w-full bg-background'
-        ref={ref}
-      >
-        {!isLoadingProducts && products.length && folders.length ? (
-          <table className='w-full overflow-y-auto table-auto bg-background'>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Tovar nomi</th>
-                <th>Tovar narxi</th>
-                <th>O'lchov birligi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(() => {
-                let productCounter = 0
-                return folders
-                  .filter((f) => {
-                    // Only show folders that are selected AND have products
-                    return (
-                      selectedFolders.includes(f._id) &&
-                      products.some((p) => p.folder === f._id)
-                    )
-                  })
-                  .map((f) => (
-                    <React.Fragment key={f._id}>
-                      <tr>
-                        <td
-                          colSpan={4}
-                          className='text-xl font-semibold text-center bg-gray-100'
-                        >
-                          {f.name}
-                        </td>
-                      </tr>
-                      {products
-                        .filter((p) => p.folder === f._id)
-                        .map((doc) => {
-                          productCounter++
-                          return (
-                            <tr key={doc._id}>
-                              <td className='px-2'>{productCounter}</td>
-                              <td className='px-2'>{doc.name}</td>
-                              <td className='px-2'>{doc.sellPrice}</td>
-                              <td className='px-2'>
-                                {doc.unit === 'piece' ? 'dona' : doc.unit}
-                              </td>
-                            </tr>
-                          )
-                        })}
-                    </React.Fragment>
-                  ))
-              })()}
-            </tbody>
-          </table>
-        ) : (
-          ''
-        )}
+      <div className='absolute top-[-9999999999999999px] -z-50 left-0 w-full bg-background'>
+        <div className='w-full h-full bg-background' ref={ref}>
+          {!isLoadingProducts && products.length && folders.length ? (
+            <table className='w-full overflow-y-auto table-auto bg-background'>
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Tovar nomi</th>
+                  <th>Tovar narxi</th>
+                  <th className='w-32'>O'lchov birligi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(() => {
+                  let productCounter = 0
+                  return folders
+                    .filter((f) => {
+                      // Only show folders that are selected AND have products
+                      return (
+                        selectedFolders.includes(f._id) &&
+                        products.some((p) => p.folder === f._id)
+                      )
+                    })
+                    .map((f) => (
+                      <React.Fragment key={f._id}>
+                        <tr>
+                          <td
+                            colSpan={4}
+                            className='text-xl font-semibold text-center bg-gray-100'
+                          >
+                            {f.name}
+                          </td>
+                        </tr>
+                        {products
+                          .filter((p) => p.folder === f._id)
+                          .map((doc) => {
+                            productCounter++
+                            return (
+                              <tr key={doc._id}>
+                                <td className='px-2'>{productCounter}</td>
+                                <td className='px-2'>{doc.name}</td>
+                                <td className='px-2'>{doc.sellPrice}</td>
+                                <td className='px-2'>
+                                  {doc.unit === 'piece' ? 'dona' : doc.unit}
+                                </td>
+                              </tr>
+                            )
+                          })}
+                      </React.Fragment>
+                    ))
+                })()}
+              </tbody>
+            </table>
+          ) : (
+            ''
+          )}
+        </div>
       </div>
     </>
   )
