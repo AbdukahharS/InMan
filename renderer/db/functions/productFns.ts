@@ -84,3 +84,31 @@ export const createProduct = async (name: string, buyPrice: number, sellPrice: n
     throw new Error('Failed to create product');
   }
 };
+
+/**
+ * Retrieves products belonging to a specific folder.
+ * @param {string} folderId - The ID of the folder to fetch products from.
+ * @returns {Promise<Product[]>} A promise that resolves to an array of products in the specified folder, sorted by name, or an empty array if an error occurs.
+ */
+export const getProductsByFolder = async (folderId: string): Promise<Product[]> => {
+  try {
+    // Fetch all documents from the productsDB
+    const result = await productsDB.allDocs({ include_docs: true });
+
+    // Map the rows to product documents
+    // Filter the products where the 'folder' property matches the provided folderId
+    // Sort the filtered products alphabetically by name
+    const products = result.rows
+        .map(row => row.doc as Product) // Asserting type Product
+        .filter(product => product.folder === folderId) // Filter by folder ID
+        .sort((a, b) => a.name.localeCompare(b.name)); // Sort by name
+
+    // Return the filtered and sorted products
+    return products;
+  } catch (error) {
+    // Log any errors that occur during the process
+    console.error(`Error fetching products for folder ${folderId}:`, error);
+    // Return an empty array in case of an error
+    return [];
+  }
+};

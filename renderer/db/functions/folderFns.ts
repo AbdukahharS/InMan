@@ -93,3 +93,39 @@ export const getFolder = async (_id: string) => {
     return null
   }
 }
+
+// Function to delete a folder
+export const deleteFolder = async (_id: string): Promise<PouchDB.Core.Response> => {
+  try {
+    // 1. Check if any other folder has this folder as its parent
+    const allDocs = await foldersDB.allDocs({ include_docs: true })
+    const isParent = allDocs.rows.some(row => {
+        // Ensure doc exists and has a parent property before checking
+        return row.doc && typeof row.doc === 'object' && 'parent' in row.doc && row.doc.parent === _id;
+    });
+
+
+    if (isParent) {
+      throw new Error('Cannot delete folder: It is the parent of one or more other folders.')
+    }
+
+    // 2. If it's not a parent, fetch the folder to get its _rev
+    // This get() also implicitly checks if the folder exists.
+    const folderToDelete = await foldersDB.get(_id)
+
+    // 3. Delete the folder
+    const response = await foldersDB.remove(folderToDelete)
+    console.log(`Folder with id ${_id} deleted successfully.`)
+    return response // Return the PouchDB response object on success
+
+  } catch (error: any) {
+    if (error.name === 'not_found') {
+        console.error(`Error deleting folder: Folder with id ${_id} not found.`)
+        throw new Error('Folder not found')
+    }
+     // Re-throw the specific "is parent" error or other caught errors
+    console.error(`Error deleting folder with id ${_id}:`, error)
+    // Throw the original error message or a generic one
+    throw new Error(error.message || 'Failed to delete folder')
+  }
+}
