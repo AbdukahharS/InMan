@@ -1,5 +1,5 @@
-2025/04/27-04:25:01.831 6ecc Recovering log #28
-2025/04/27-04:25:01.831 6ecc Level-0 table #31: started
-2025/04/27-04:25:01.842 6ecc Level-0 table #31: 321 bytes OK
-2025/04/27-04:25:01.849 6ecc Delete type=0 #28
-2025/04/27-04:25:01.849 6ecc Delete type=3 #26
+2025/04/27-07:47:31.080 11f4 Recovering log #32
+2025/04/27-07:47:31.080 11f4 Level-0 table #34: started
+2025/04/27-07:47:31.099 11f4 Level-0 table #34: 489 bytes OK
+2025/04/27-07:47:31.107 11f4 Delete type=0 #32
+2025/04/27-07:47:31.107 11f4 Delete type=3 #30
