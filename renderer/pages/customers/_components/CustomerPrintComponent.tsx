@@ -16,7 +16,7 @@ const CustomerPrintComponent = ({ customers }: { customers: Customer[] }) => {
   }, [])
 
   const renderRows = (start: number, count: number) => {
-    return customers.slice(start, start + count).map((customer, index) => (
+    return customers?.slice(start, start + count).map((customer, index) => (
       <tr key={`${customer._id}-${start + index}`}>
         <td className="px-2 py-1">{start + index + 1}</td>
         <td className="px-2 py-1">{customer.name}</td>
@@ -51,7 +51,7 @@ const CustomerPrintComponent = ({ customers }: { customers: Customer[] }) => {
     // Remaining customers
     for (
       let start = initialPageCount;
-      start < customers.length;
+      start < customers?.length;
       start += subsequentPageCount
     ) {
       tables.push(
@@ -78,7 +78,7 @@ const CustomerPrintComponent = ({ customers }: { customers: Customer[] }) => {
             </div>
           )}
           <div>
-            <b>Jami mijozlar:</b> {customers.length}
+            <b>Jami mijozlar:</b> {customers?.length}
           </div>
         </div>
       </div>
