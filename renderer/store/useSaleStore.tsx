@@ -10,6 +10,7 @@ type SaleStore = {
     unit: 'piece' | 'm' | 'kg' | 'm2'
   }[] // Make products an array that can be empty
   totalSellPrice: number
+  discount?: number
   payment: {
     cash: number
     card: number
@@ -28,6 +29,7 @@ type SaleStore = {
       cash: number
       card: number
     }
+    discount?: number
   }
   addItem: (
     _id: string,
@@ -39,6 +41,7 @@ type SaleStore = {
   setCustomer: (id: string) => void
   changeTotalSellPrice: (totalSellPrice: number) => void
   changeAmount: (id: string, amount: number) => void
+  setDiscount: (discount?: number) => void
   clear: () => void
   removeItem: (id: string) => void
   paymentCash: (cash?: string) => void
@@ -48,6 +51,7 @@ type SaleStore = {
     products,
     totalSellPrice,
     payment,
+    discount,
   }: {
     _id: string
     products: {
@@ -62,6 +66,7 @@ type SaleStore = {
       cash: number
       card: number
     }
+    discount?: number
   }) => void
 }
 
@@ -114,17 +119,19 @@ const useSale = create<SaleStore>((set, get) => ({
   setCustomer: (id) => {
     set({ customer: id })
   },
-  setPrev: ({ _id, products, totalSellPrice, payment }) => {
+  setPrev: ({ _id, products, totalSellPrice, payment, discount }) => {
     set(prev => ({
       customer: prev.customer,
       products,
       totalSellPrice,
       payment,
+      discount,
       prev: {
         _id,
         products,
         totalSellPrice,
         payment,
+        discount,
       },
     }))
   },
@@ -157,6 +164,7 @@ const useSale = create<SaleStore>((set, get) => ({
       products: [],
       totalSellPrice: 0,
       payment: { cash: 0, card: 0 },
+      discount: undefined,
     })
   },
   paymentCash: (cash) => {
@@ -175,6 +183,12 @@ const useSale = create<SaleStore>((set, get) => ({
         card: Number(card),
         cash: prev.payment.cash,
       },
+    }))
+  },
+  setDiscount: (discount) => {
+    set((prev) => ({
+      ...prev,
+      discount,
     }))
   },
   removeItem: (id) => {

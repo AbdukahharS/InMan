@@ -12,6 +12,19 @@ function parseDate(dateString: string) {
   return new Date(year, month - 1, day).getTime() // Month is zero-indexed
 }
 
+function sortDatesDescending(dates: Sale[]): Sale[] {
+  return dates.sort((a, b) => {
+    const [dayA, monthA, yearA] = a.timeStamp.split('.').map(Number);
+    const [dayB, monthB, yearB] = b.timeStamp.split('.').map(Number);
+
+    const dateA = new Date(yearA, monthA - 1, dayA);
+    const dateB = new Date(yearB, monthB - 1, dayB);
+
+    return dateB.getTime() - dateA.getTime(); // recent first
+  });
+}
+
+
 interface Props {
   start: string
   end: string
@@ -42,7 +55,7 @@ const SaleList = ({ start, end, active, handleClick }: Props) => {
 
   useEffect(() => {
     if (sales) {
-      const summ = sales.reduce((a, b) => a + b.totalSellPrice, 0)
+      const summ = sales.reduce((a, b) => a + (b.totalSellPrice * (1 - (b.discount || 0)/100)), 0)
       const cash = sales.reduce((a, b) => a + b.payment.cash, 0)
       const card = sales.reduce((a, b) => a + b.payment.card, 0)
       const debt = summ - (cash + card)
@@ -63,16 +76,17 @@ const SaleList = ({ start, end, active, handleClick }: Props) => {
           <table className='w-full overflow-y-auto table-auto'>
             <thead>
               <tr>
-                <th>No</th>
+                <th className='w-10'>No</th>
                 <th>Mijoz ismi</th>
-                <th>Tovar summasi</th>
+                <th className='w-32'>Tovar summasi</th>
                 <th>Naqd</th>
                 <th>Karta</th>
                 <th>Qarz</th>
+                <th className='w-24'>Sana</th>
               </tr>
             </thead>
             <tbody>
-              {sales.map((doc, i) => (
+              {sortDatesDescending(sales).map((doc, i) => (
                 <SaleItem
                   key={doc._id}
                   {...doc}

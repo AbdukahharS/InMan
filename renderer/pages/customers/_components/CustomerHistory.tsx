@@ -3,7 +3,7 @@ import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/use-toast'
 import { getSalesInDateRangeCustomer } from '@/db/functions/saleFns'
 import { Customer, Sale } from '@/db/schemas'
-import SaleItem from '@/pages/history/_components/SaleItem'
+import SaleItem from './SaleItem'
 import { ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useReactToPrint } from 'react-to-print'
@@ -72,7 +72,7 @@ const CustomerHistory = ({ customer }: { customer: Customer }) => {
 
   useEffect(() => {
     if (sales) {
-      const summ = sales.reduce((a, b) => a + b.totalSellPrice, 0)
+      const summ = sales.reduce((a, b) => a + b.totalSellPrice * (1 - (b.discount || 0)/100), 0)
       const cash = sales.reduce((a, b) => a + b.payment.cash, 0)
       const card = sales.reduce((a, b) => a + b.payment.card, 0)
       const debt = summ - (cash + card)
@@ -208,6 +208,18 @@ const CustomerHistory = ({ customer }: { customer: Customer }) => {
           active?.totalSellPrice as number
         )}
       </p>
+      {active?.discount && (
+        <>
+        <p >
+          Chegirma: {new Intl.NumberFormat('en-US').format(active.discount)}%
+        </p>
+        <p>
+          Chegirmadagi jami summa:{' '}
+          {new Intl.NumberFormat('en-US').format(
+            active.totalSellPrice * (1-active.discount / 100)
+          )}</p>
+        </>
+      )}
       <table className='w-full overflow-y-auto table-auto mt-4'>
         <thead>
           <tr>
@@ -268,7 +280,7 @@ const CustomerHistory = ({ customer }: { customer: Customer }) => {
             <thead>
               <tr>
                 <th>No</th>
-                <th>Mijoz ismi</th>
+                <th>Savdo sanasi</th>
                 <th>Tovar summasi</th>
                 <th>Naqd</th>
                 <th>Karta</th>

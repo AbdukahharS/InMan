@@ -15,6 +15,14 @@ const salesDB = new PouchDB('sales')
 const customersDB = new PouchDB('customers')
 const warehouseDB = new PouchDB('warehouse')
 
+// Helper function to calculate final price after discount
+function calculateDiscountedPrice(price: number, discount?: number) {
+  if (discount === undefined || discount <= 0 || discount >= 100) {
+    return price
+  }
+  return round(price * (1 - discount / 100))
+}
+
 // Get a single sale by ID
 export const getSale = async (id: string) => {
   try {
@@ -42,6 +50,7 @@ export const performSale = async (args: {
     card: number
   }
   timeStamp: string
+  discount?: number
 }) => {
   try {
     // Get the customer document
@@ -56,17 +65,18 @@ export const performSale = async (args: {
       products: args.products,
       totalSellPrice: round(args.totalSellPrice),
       payment: args.payment,
+      discount: args.discount,  // Add the optional discount
     }
 
     const sale = await salesDB.post(saleDocument)
 
+    // Calculate the amount to add to debt (using discounted price if discount exists)
+    const amountToAddToDebt = calculateDiscountedPrice(round(args.totalSellPrice), args.discount) - 
+                             args.payment.cash - 
+                             args.payment.card
+    
     // Update customer debt
-    const updatedDebt = round(
-      cust.debt +
-        round(args.totalSellPrice) -
-        args.payment.cash -
-        args.payment.card
-    )
+    const updatedDebt = round(cust.debt + amountToAddToDebt)
     await customersDB.put({
       ...cust,
       debt: updatedDebt,
@@ -214,14 +224,46 @@ export const updateSale = async (args: {
     cash: number
     card: number
   }
+  discount?: number
 }) => {
   try {
-    const sale = await salesDB.get(args._id)
+    const sale = await salesDB.get(args._id) as any as Sale
+    const oldSale = { ...sale }
+    
     const updatedSale = {
       ...sale,
       products: args.products,
       totalSellPrice: round(args.totalSellPrice),
       payment: args.payment,
+      discount: args.discount !== undefined ? args.discount : sale.discount, // Preserve existing discount if not explicitly changed
+    }
+
+    // Get the customer to update their debt based on the changes
+    if (sale.customer) {
+      const customer = (await customersDB.get(sale.customer)) as Customer
+      
+      if (customer) {
+        // Calculate old debt impact (original price minus payments, adjusted by discount)
+        const oldDebtImpact = calculateDiscountedPrice(oldSale.totalSellPrice, oldSale.discount) - 
+                             oldSale.payment.cash - 
+                             oldSale.payment.card
+        
+        // Calculate new debt impact (new price minus payments, adjusted by discount)
+        const newDebtImpact = calculateDiscountedPrice(updatedSale.totalSellPrice, updatedSale.discount) - 
+                             updatedSale.payment.cash - 
+                             updatedSale.payment.card
+        
+        // Calculate the net change to apply to customer debt
+        const debtChange = newDebtImpact - oldDebtImpact
+        
+        // Update customer debt
+        const updatedCustomer = {
+          ...customer,
+          debt: round(customer.debt + debtChange)
+        }
+        
+        await customersDB.put(updatedCustomer)
+      }
     }
 
     await salesDB.put(updatedSale)
@@ -272,8 +314,11 @@ export const returnProductFromSale = async (
       )
     }
 
-    // Calculate refund amount based on returned quantity
-    const refundAmount = round(returnAmount * saleProduct.sellPrice)
+    // Calculate refund amount based on returned quantity (original price)
+    const originalRefundAmount = round(returnAmount * saleProduct.sellPrice)
+    
+    // Calculate discounted refund amount for customer debt adjustment
+    const discountedRefundAmount = calculateDiscountedPrice(originalRefundAmount, sale.discount)
 
     // Get warehouse item to update inventory
     const warehouseResult = await warehouseDB.allDocs({
@@ -311,7 +356,7 @@ export const returnProductFromSale = async (
       updatedSale = {
         ...sale,
         products: updatedProducts,
-        totalSellPrice: round(sale.totalSellPrice - refundAmount),
+        totalSellPrice: round(sale.totalSellPrice - originalRefundAmount),
       }
     } else {
       // Reduce product amount if partial return
@@ -324,7 +369,7 @@ export const returnProductFromSale = async (
       updatedSale = {
         ...sale,
         products: updatedProducts,
-        totalSellPrice: round(sale.totalSellPrice - refundAmount),
+        totalSellPrice: round(sale.totalSellPrice - originalRefundAmount),
       }
     }
 
@@ -335,7 +380,7 @@ export const returnProductFromSale = async (
       if (customer) {
         const updatedCustomer = {
           ...customer,
-          debt: round(customer.debt - refundAmount),
+          debt: round(customer.debt - discountedRefundAmount),
         }
         await customersDB.put(updatedCustomer)
       }

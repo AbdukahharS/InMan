@@ -171,6 +171,20 @@ const SaleDetails = ({ active }: Props) => {
               sale?.totalSellPrice as number
             )}
           </p>
+          {sale?.discount && (
+            <>
+              <p>
+                Chegirma: {new Intl.NumberFormat('en-US').format(sale.discount)}
+                %
+              </p>
+              <p>
+                Chegirmadagi jami summa:{' '}
+                {new Intl.NumberFormat('en-US').format(
+                  sale.totalSellPrice * (1 - sale.discount / 100)
+                )}
+              </p>
+            </>
+          )}
           <table className='w-full overflow-y-auto table-auto mt-4'>
             <thead>
               <tr>

@@ -69,6 +69,7 @@ export interface Sale {
     card: number
   }
   timeStamp: string
+  discount?: number // New optional discount property (0-100, exclusive)
 }
 
 export interface Folder {
@@ -161,6 +162,7 @@ export const saleSchema = Joi.object<Sale>({
     card: Joi.number().required(),
   }).required(),
   timeStamp: Joi.string().default(today),
+  discount: Joi.number().greater(0).less(100), // Validate discount is exclusive between 0 and 100
 })
 
 export const folderSchema = Joi.object<Folder>({

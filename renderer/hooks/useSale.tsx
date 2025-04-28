@@ -35,6 +35,8 @@ const useSale = () => {
     paymentCard,
     paymentCash,
     clear: clearSale,
+    discount,
+    setDiscount,
   } = useSaleStore()
 
   useEffect(() => {
@@ -69,6 +71,7 @@ const useSale = () => {
         products: todaySale.products,
         totalSellPrice: todaySale.totalSellPrice,
         payment: todaySale.payment,
+        discount: todaySale.discount,
       })
     } else {
       setSaleCustomer(v)
@@ -96,6 +99,8 @@ const useSale = () => {
     paymentCard,
     paymentCash,
     updateCustomer,
+    discount,
+    setDiscount,
   }
 }
 

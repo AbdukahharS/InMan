@@ -37,7 +37,7 @@ const SaleItem = ({
   payment,
   customer,
   preDebt,
-  discount
+  discount,
 }: SaleItemProps) => {
   const [customerObj, setCustomerObj] = useState<Customer | null>(null)
 
@@ -69,7 +69,7 @@ const SaleItem = ({
     >
       <td className='px-2'>{i + 1}</td>
       <td className='px-2'>
-        <div className='w-full truncate'>{customerObj?.name}</div>
+        <div className='w-full truncate'>{timeStamp}</div>
       </td>
       <td className='px-2'>
         <div className='text-foreground/60 truncate'>
@@ -91,11 +91,6 @@ const SaleItem = ({
           {new Intl.NumberFormat('en-US').format(
             (totalSellPrice * (1 - (discount || 0) / 100)) - payment?.cash - payment?.card
           )}
-        </div>
-      </td>
-      <td className='px-2'>
-        <div className='text-foreground/60 truncate'>
-          {timeStamp}
         </div>
       </td>
     </tr>

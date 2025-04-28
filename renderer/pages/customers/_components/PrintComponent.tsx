@@ -16,7 +16,7 @@ const PrintComponent = ({
         <span>
           Qarz: {new Intl.NumberFormat('en-US').format(customer?.debt || 0)}
         </span>
-        <span>{new Date().toLocaleString()}</span>
+        <span>{sale.timeStamp}</span>
       </div>
       <table className='w-full table-auto mt-3 print-table'>
         <thead>
@@ -37,7 +37,7 @@ const PrintComponent = ({
                 {new Intl.NumberFormat('en-US').format(p.sellPrice)}
               </td>
               <td className='px-1'>
-                {p.amount} {p.unit === 'piece' ? 'Шт' : p.unit}
+                {p.amount} {p.unit === 'piece' ? 'dona' : p.unit}
               </td>
               <td className='px-1'>
                 {new Intl.NumberFormat('en-US').format(p.sellPrice * p.amount)}
@@ -58,6 +58,18 @@ const PrintComponent = ({
           Plastik: {new Intl.NumberFormat('en-US').format(sale.payment.card)}
         </span>
       </div>
+      {sale.discount && (
+        <div className='w-full flex items-center gap-6 mt-2'>
+        <span className='pr-2 border-r'>
+          Chegirmadagi umumiy summa:{' '}
+          {new Intl.NumberFormat('en-US').format(sale.totalSellPrice * (1 - sale.discount / 100))}
+        </span>
+        <span>
+          Chegirma: {new Intl.NumberFormat('en-US').format(sale.discount)}%
+        </span>
+       
+      </div>
+      )}
     </div>
   ) : null
 }
