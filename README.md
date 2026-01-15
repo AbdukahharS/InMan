@@ -1,33 +1,82 @@
-<img src="https://avatars.githubusercontent.com/u/75196660?s=120&v=4" align="right" height="70" width="70" border-radius="50%">
+# InMan - Inventory Management System
 
-##### Shahzod Abdukahhar <kbd>[Github](https://github.com/AbdukahharS) / [LinkedIn](https://www.linkedin.com/in/shahzod-kahhorov/)  / [Telegram](https://t.me/shahzod_qaxxorov) /  [E-Mail](mailto:shahzod@abdukahhar.com)</kbd>
+Cross-platform desktop application for inventory management, built with Nextron (Next.js + Electron).
 
-# InMan
+## About
 
-**InMan** is an Inventory Management System for desktop, built using **Nextron** (Next.js and Electron). It is designed for businesses that require supplier, intake, warehouse, customer, and sales management, all within a single app.
+InMan is a desktop inventory management system designed for businesses that need to manage:
+- Suppliers
+- Warehouse and intake operations
+- Customers
+- Sales and orders
 
-This is my first desktop application and my first project handling large amounts of data, so there may be bugs and potential security risks. If you encounter any issues, please feel free to report them by filing an issue 😊.
+## Tech Stack
+
+- Nextron (Next.js + Electron)
+- React 18
+- TypeScript
+- Tailwind CSS
+- Radix UI (headless components)
+- Zustand (state management)
+- PouchDB (local database)
+- Electron Store (settings persistence)
+- Lucide React (icons)
 
 ## Features
-- Supplier management
-- Warehouse and intake management
-- Customer and sales tracking
-- Cross-platform desktop support (via Electron)
 
-## Setup
+- **Supplier Management** - Add, edit, track suppliers
+- **Warehouse Management** - Track inventory and intake
+- **Customer Management** - Manage customer data
+- **Sales Tracking** - Track orders and sales
+- **Cross-Platform** - Runs on Windows, macOS, Linux
+- **Offline Support** - Local PouchDB database
+- **Print Support** - Generate printable documents
+- **Dark Mode** - Theme support
 
-To set up the project locally:
+## Getting Started
 
-1. Clone the repository and navigate to the project directory.
-2. Install the dependencies using `npm`.
+### Prerequisites
+
+- Node.js
+- npm or yarn
+
+### Installation
 
 ```bash
+# Clone the repository
 git clone https://github.com/AbdukahharS/InMan
 cd InMan
+
+# Install dependencies
 npm install
+
+# Run in development mode
+npm run dev
+
+# Build for production
+npm run build
+
+# Build for specific platform
+npm run build:win32    # Windows 32-bit
+npm run build:win64    # Windows 64-bit
 ```
-Once the installation is complete, you're good to go!
+
+## Project Structure
+
+```
+app/
+├── background.js         # Electron background process
+├── renderer/             # Next.js renderer process
+├── main/                 # Main process code
+├── preload/              # Preload scripts
+├── store/                # Electron store
+public/                   # Static assets and icons
+```
+
+## Notes
+
+This is a desktop application built with Electron. Unlike web apps, it has access to the file system and other system resources.
 
 ## Acknowledgements
 
- - [Nextron](https://github.com/saltyshiomix/nextron) - an integration of Next.js and Electron.
+- [Nextron](https://github.com/saltyshiomix/nextron) - Electron + Next.js integration
